@@ -1,22 +1,25 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Player_SC : MonoBehaviour {
 
-    public float speed;
-
+    private float maxAcceleration = 2f;
+    private float fireSpeed = 5f;
     private float xMin, xMax, offsetSpace = 1f;
+    private GameObject playerProjectiles_GO;
+    public GameObject projectile_GO;
 
     // Use this for initialization
     void Start() {
         Debug.Log("Player_SC started!");
         computePlayersMaxPosition();
+        playerProjectiles_GO = GameObject.Find("PlayerProjectiles");
     }
 
     // Update is called once per frame
     void Update() {
         playerMovementController();
         playerMovementByDefault(1f);
+        fireController();
     }
 
     private void computePlayersMaxPosition() {
@@ -32,12 +35,12 @@ public class Player_SC : MonoBehaviour {
 
     private void playerMovementController() {
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) {
-            changePlayerPosition(Vector3.left, speed);
+            changePlayerPosition(Vector3.left, maxAcceleration);
         } else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) {
-            changePlayerPosition(Vector3.right, speed);
+            changePlayerPosition(Vector3.right, maxAcceleration);
         }
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) {
-            changePlayerPosition(Vector3.up, speed);
+            changePlayerPosition(Vector3.up, maxAcceleration);
         } else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) {
             // changePlayerPosition(Vector3.down, speed);
         }
@@ -53,6 +56,21 @@ public class Player_SC : MonoBehaviour {
         changePlayerPosition(Vector3.up, levelRunningSpeed);
     }
 
+    private void fireController() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            InvokeRepeating("fire", 0.001f, 0.5f);
+        }
+        if (Input.GetKeyUp(KeyCode.Space)) {
+            CancelInvoke("fire");
+        }
+    }
+
+    private void fire() {
+        GameObject fire = Instantiate(projectile_GO, this.transform.position, Quaternion.identity) as GameObject;
+        fire.transform.parent = playerProjectiles_GO.transform;
+        fire.GetComponent<Rigidbody2D>().velocity = new Vector2(0, fireSpeed);
+        // add audio
+    }
 
 
 
