@@ -69,6 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Background_SC.cs" />
+    <Compile Include="Assets\Scripts\EnemyFree_SC.cs" />
+    <Compile Include="Assets\Scripts\FreeEnemy_1_SC.cs" />
+    <Compile Include="Assets\Scripts\FreeEnemy_2_SC.cs" />
     <Compile Include="Assets\Scripts\GameManager_SC.cs" />
     <Compile Include="Assets\Scripts\LevelSettings_SC.cs" />
     <Compile Include="Assets\Scripts\MainCamera_SC.cs" />

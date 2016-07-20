@@ -2,6 +2,10 @@
 
 public class Player_SC : MonoBehaviour {
 
+    public Texture2D leftArrowButton;
+    public Texture2D rightArrowButton;
+    public Texture2D fireButton;
+
     private float maxAcceleration = 2f;
     private float fireSpeed = 5f;
     private float xMin, xMax, offsetSpace = 1f;
@@ -17,7 +21,7 @@ public class Player_SC : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        playerMovementController();
+        playerMovementController(KeyCode.F15);
         playerMovementByDefault(1f);
         fireController();
     }
@@ -33,10 +37,12 @@ public class Player_SC : MonoBehaviour {
         xMax = maxRight.x - offsetSpace;
     }
 
-    private void playerMovementController() {
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) {
+
+
+    private void playerMovementController(KeyCode keyCode) {
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || keyCode == KeyCode.A) {
             changePlayerPosition(Vector3.left, maxAcceleration);
-        } else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) {
+        } else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) || keyCode == KeyCode.D) {
             changePlayerPosition(Vector3.right, maxAcceleration);
         }
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) {
@@ -75,4 +81,63 @@ public class Player_SC : MonoBehaviour {
 
 
 
+
+    void OnGUI() {
+        /*
+        if(GUI.RepeatButton(new Rect(15, 15, leftArrowButton.width, leftArrowButton.height), leftArrowButton)) {
+            Debug.Log("Left Arrow Pressed");
+        }*/
+
+        int distanceBetweenButtons = 30;
+
+        if (GUI.RepeatButton(new Rect(0 + distanceBetweenButtons, Screen.height - leftArrowButton.height / 2 - distanceBetweenButtons, leftArrowButton.width, leftArrowButton.height), leftArrowButton)) {
+            Debug.Log("Left Arrow Pressed");
+            playerMovementController(KeyCode.A);
+        }
+
+        if (GUI.RepeatButton(new Rect(0 + leftArrowButton.width + 2 * distanceBetweenButtons, Screen.height - leftArrowButton.height / 2 - distanceBetweenButtons, leftArrowButton.width, leftArrowButton.height), rightArrowButton)) {
+            Debug.Log("Right Arrow Pressed");
+            playerMovementController(KeyCode.D);
+        }
+
+        if (GUI.Button(new Rect(Screen.width - fireButton.width/2 - distanceBetweenButtons , Screen.height - fireButton.height / 2 - distanceBetweenButtons, fireButton.width, fireButton.height), fireButton)) {
+            Debug.Log("Fire Pressed");
+            fire();
+        }
+
+
+
+
+
+        /* GUI.Button(new Rect(15, 15, 100, 50), "test"); -> create the button */
+
+        /* button created and is clickable
+        if (GUI.Button(new Rect(15, 15, 100, 50), "test")) {
+            //TODO: actions
+        }*/
+
+        /*
+        public Texture2D buttonImage = null;
+        if(GUI.Button(new Rect(15, 15, 100, 50), buttonImage){
+            // the button has an image
+        }*/
+        /*
+      // Texture2D buttonImage = null;
+        //if(GUI.Button(new Rect(15, 15, buttonImage.width, buttonImage.height), buttonImage){
+            // the button has an image
+        }*/
+
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
