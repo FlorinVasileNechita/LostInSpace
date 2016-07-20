@@ -1,10 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Player_SC : MonoBehaviour {
 
-    public Texture2D leftArrowButton;
-    public Texture2D rightArrowButton;
-    public Texture2D fireButton;
+    public Texture2D leftArrowButtonTexture;
+    private Rect leftArrowButtonRect;
+    public Texture2D rightArrowButtonTexture;
+    private Rect rightArrowButtonRect;
+    public Texture2D fireButtonTexture;
+    private Rect fireButtonRect;
 
     private float maxAcceleration = 2f;
     private float fireSpeed = 5f;
@@ -16,6 +20,7 @@ public class Player_SC : MonoBehaviour {
     void Start() {
         Debug.Log("Player_SC started!");
         computePlayersMaxPosition();
+        generateUiButtons();
         playerProjectiles_GO = GameObject.Find("PlayerProjectiles");
     }
 
@@ -23,6 +28,7 @@ public class Player_SC : MonoBehaviour {
     void Update() {
         playerMovementController(KeyCode.F15);
         playerMovementByDefault(1f);
+        controllUiButtons();
         fireController();
     }
 
@@ -37,9 +43,7 @@ public class Player_SC : MonoBehaviour {
         xMax = maxRight.x - offsetSpace;
     }
 
-
-
-    private void playerMovementController(KeyCode keyCode) {
+    public void playerMovementController(KeyCode keyCode) {
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || keyCode == KeyCode.A) {
             changePlayerPosition(Vector3.left, maxAcceleration);
         } else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) || keyCode == KeyCode.D) {
@@ -71,63 +75,75 @@ public class Player_SC : MonoBehaviour {
         }
     }
 
-    private void fire() {
+    public void fire() {
         GameObject fire = Instantiate(projectile_GO, this.transform.position, Quaternion.identity) as GameObject;
         fire.transform.parent = playerProjectiles_GO.transform;
         fire.GetComponent<Rigidbody2D>().velocity = new Vector2(0, fireSpeed);
         // add audio
     }
 
+    private int[] leftArrowButtonProperties;
+    private int[] rightArrowButtonProperties;
+    private int[] fireButtonProperties;
 
-
-
-
-    void OnGUI() {
-        /*
-        if(GUI.RepeatButton(new Rect(15, 15, leftArrowButton.width, leftArrowButton.height), leftArrowButton)) {
-            Debug.Log("Left Arrow Pressed");
-        }*/
-
+    private void generateUiButtons() {
         int distanceBetweenButtons = 30;
 
-        if (GUI.RepeatButton(new Rect(0 + distanceBetweenButtons, Screen.height - leftArrowButton.height / 2 - distanceBetweenButtons, leftArrowButton.width, leftArrowButton.height), leftArrowButton)) {
-            Debug.Log("Left Arrow Pressed");
-            playerMovementController(KeyCode.A);
+        leftArrowButtonProperties = new int[] { 0, Screen.height - leftArrowButtonTexture.height / 2 - distanceBetweenButtons, leftArrowButtonTexture.width, leftArrowButtonTexture.height };
+        leftArrowButtonRect = new Rect(leftArrowButtonProperties[0], leftArrowButtonProperties[1], leftArrowButtonProperties[2], leftArrowButtonProperties[3]);
+
+        rightArrowButtonProperties = new int[] { leftArrowButtonTexture.width + 2 * distanceBetweenButtons, Screen.height - leftArrowButtonTexture.height / 2 - distanceBetweenButtons, leftArrowButtonTexture.width, leftArrowButtonTexture.height };
+        rightArrowButtonRect = new Rect(rightArrowButtonProperties[0], rightArrowButtonProperties[1], rightArrowButtonProperties[2], rightArrowButtonProperties[3]);
+
+        fireButtonProperties = new int[] { Screen.width - fireButtonTexture.width / 2 - distanceBetweenButtons, Screen.height - fireButtonTexture.height / 2 - distanceBetweenButtons, fireButtonTexture.width, fireButtonTexture.height };
+        fireButtonRect = new Rect(fireButtonProperties[0], fireButtonProperties[1], fireButtonProperties[2], fireButtonProperties[3]);
+    }
+
+    void OnGUI() {
+        GUI.Button(leftArrowButtonRect, leftArrowButtonTexture);
+        GUI.Button(rightArrowButtonRect, rightArrowButtonTexture);
+        GUI.Button(fireButtonRect, fireButtonTexture);
+    }
+
+    void controllUiButtons() {
+        foreach (Touch touch in Input.touches) {
+            // if (leftRectButton.Contains(touch.position)) {
+            if ((touch.phase == TouchPhase.Began) || (touch.phase == TouchPhase.Stationary)) {
+                if (verifyTouchedButton(touch, leftArrowButtonProperties)) {
+                    Debug.Log("LEFT ARROW PRESSED");
+                    playerMovementController(KeyCode.A);
+                } else {
+                    if (verifyTouchedButton(touch, rightArrowButtonProperties)) {
+                        Debug.Log("RIGHT ARROW PRESSED");
+                        playerMovementController(KeyCode.D);
+                    }
+                }
+            }
+            // FIRE ZONE
+            if (verifyTouchedButton(touch, fireButtonProperties)) {
+                if (touch.phase == TouchPhase.Began) {
+                    fire();
+                }
+            }
         }
+    }
 
-        if (GUI.RepeatButton(new Rect(0 + leftArrowButton.width + 2 * distanceBetweenButtons, Screen.height - leftArrowButton.height / 2 - distanceBetweenButtons, leftArrowButton.width, leftArrowButton.height), rightArrowButton)) {
-            Debug.Log("Right Arrow Pressed");
-            playerMovementController(KeyCode.D);
+    private bool verifyTouchedButton(Touch currentTouch, int[] buttonProperties) {
+        int xStartPosition = buttonProperties[0];
+        int xEndPosition = buttonProperties[0] + buttonProperties[2];
+        int yStartPosition = buttonProperties[1];
+        int yEndPosition = buttonProperties[1] + buttonProperties[3];
+
+        Debug.Log("Touch[" + currentTouch.position.x + "," + currentTouch.position.y + "]");
+        Debug.Log("X=[" + xStartPosition + "," + xEndPosition + "]");
+        Debug.Log("Y=[" + yStartPosition + "," + yEndPosition + "]");
+
+        if (currentTouch.position.x >= buttonProperties[0] && currentTouch.position.x <= buttonProperties[0] + buttonProperties[2]) {
+            //if (currentTouch.position.y >= buttonProperties[1] && currentTouch.position.y <= buttonProperties[1] + buttonProperties[3]) {
+            return true;
+            //}
         }
-
-        if (GUI.Button(new Rect(Screen.width - fireButton.width/2 - distanceBetweenButtons , Screen.height - fireButton.height / 2 - distanceBetweenButtons, fireButton.width, fireButton.height), fireButton)) {
-            Debug.Log("Fire Pressed");
-            fire();
-        }
-
-
-
-
-
-        /* GUI.Button(new Rect(15, 15, 100, 50), "test"); -> create the button */
-
-        /* button created and is clickable
-        if (GUI.Button(new Rect(15, 15, 100, 50), "test")) {
-            //TODO: actions
-        }*/
-
-        /*
-        public Texture2D buttonImage = null;
-        if(GUI.Button(new Rect(15, 15, 100, 50), buttonImage){
-            // the button has an image
-        }*/
-        /*
-      // Texture2D buttonImage = null;
-        //if(GUI.Button(new Rect(15, 15, buttonImage.width, buttonImage.height), buttonImage){
-            // the button has an image
-        }*/
-
-
+        return false;
     }
 }
 
