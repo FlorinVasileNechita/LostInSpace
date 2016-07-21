@@ -16,6 +16,8 @@ public class Player_SC : MonoBehaviour {
     private GameObject playerProjectiles_GO;
     public GameObject projectile_GO;
 
+    public AudioClip fireSound;
+
     // Use this for initialization
     void Start() {
         Debug.Log("Player_SC started!");
@@ -57,9 +59,9 @@ public class Player_SC : MonoBehaviour {
     }
 
     private void changePlayerPosition(Vector3 vector3, float speed) {
-        this.transform.position += vector3 * speed * Time.deltaTime;
+        transform.position += vector3 * speed * Time.deltaTime;
         float newX = Mathf.Clamp(transform.position.x, xMin, xMax);
-        this.transform.position = new Vector3(newX, this.transform.position.y, this.transform.position.z);
+        transform.position = new Vector3(newX,transform.position.y, transform.position.z);
     }
 
     private void playerMovementByDefault(float levelRunningSpeed) {
@@ -76,10 +78,11 @@ public class Player_SC : MonoBehaviour {
     }
 
     public void fire() {
-        GameObject fire = Instantiate(projectile_GO, this.transform.position, Quaternion.identity) as GameObject;
+        GameObject fire = Instantiate(projectile_GO, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity) as GameObject;
         fire.transform.parent = playerProjectiles_GO.transform;
         fire.GetComponent<Rigidbody2D>().velocity = new Vector2(0, fireSpeed);
         // add audio
+        AudioSource.PlayClipAtPoint(fireSound, transform.position);
     }
 
     private int[] leftArrowButtonProperties;
@@ -145,6 +148,18 @@ public class Player_SC : MonoBehaviour {
         }
         return false;
     }
+
+    void OnTriggerEnter2D(Collider2D collider) {
+        if (collider.transform.tag.Equals("FreeEnemy")) {
+            Destroy(collider.gameObject);
+        } else {
+            Debug.Log("PLAYER - Collider detected");
+        }
+    }
+
+
+
+
 }
 
 

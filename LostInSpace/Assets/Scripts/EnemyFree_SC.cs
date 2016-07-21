@@ -31,5 +31,9 @@ public class EnemyFree_SC : MonoBehaviour {
         Gizmos.DrawWireSphere(transform.position, 0.5f);
     }
 
+    private void OnTriggerEnter2D() {
+        Debug.Log("TEST");
+    }
+
 
 }
