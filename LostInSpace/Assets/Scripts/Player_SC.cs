@@ -14,6 +14,9 @@ public class Player_SC : MonoBehaviour {
     public int health;
     private Text healthLabel;
 
+    public AudioClip lowHealth;
+    private bool lowHealthIsPlaying = false;
+
     private float maxAcceleration = 2f;
     private float fireSpeed = 5f;
     private float xMin, xMax, offsetSpace = 1f;
@@ -40,7 +43,9 @@ public class Player_SC : MonoBehaviour {
         playerMovementByDefault(1f);
         controllUiButtons();
         fireController();
+        playerIsDead();
         updateHealthLabel();
+        checkLowHealth();
     }
 
     private void computePlayersMaxPosition() {
@@ -164,11 +169,6 @@ public class Player_SC : MonoBehaviour {
         if (missle) {
             health -= missle.getDamage();
             Destroy(collider.gameObject);
-            if (health <= 0) {
-                Debug.Log("Player dead!");
-                Destroy(gameObject);
-                //gameManagerScript.loadLevel("WinScene");
-            }
         }
 
 
@@ -176,9 +176,33 @@ public class Player_SC : MonoBehaviour {
 
     }
 
+    private void playerIsDead() {
+        if (health <= 0) {
+            Debug.Log("Player dead!");
+            Destroy(gameObject);
+            //gameManagerScript.loadLevel("WinScene");
+        }
+    }
 
     private void updateHealthLabel() {
         healthLabel.text = health.ToString();
+    }
+
+    public void addHealth(int value) {
+        health += value;
+    }
+
+    private void checkLowHealth() {
+        if (health <= 40) {
+            if (!lowHealthIsPlaying) {
+                lowHealthIsPlaying = true;
+                AudioSource.PlayClipAtPoint(lowHealth, transform.position);
+            }
+        } else if (health > 40) {
+            if (lowHealthIsPlaying) {
+                lowHealthIsPlaying = false;
+            }
+        }
     }
 
 
