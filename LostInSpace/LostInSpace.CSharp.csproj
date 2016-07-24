@@ -74,7 +74,9 @@
     <Compile Include="Assets\Scripts\GameManager_SC.cs" />
     <Compile Include="Assets\Scripts\LevelSettings_SC.cs" />
     <Compile Include="Assets\Scripts\MainCamera_SC.cs" />
+    <Compile Include="Assets\Scripts\Missle_SC.cs" />
     <Compile Include="Assets\Scripts\Player_SC.cs" />
+    <Compile Include="Assets\Scripts\ScoreController_SC.cs" />
     <Compile Include="Assets\Scripts\Shreder_SC.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

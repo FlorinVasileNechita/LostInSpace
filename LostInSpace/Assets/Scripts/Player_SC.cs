@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player_SC : MonoBehaviour {
 
@@ -10,11 +11,16 @@ public class Player_SC : MonoBehaviour {
     public Texture2D fireButtonTexture;
     private Rect fireButtonRect;
 
+    public int health;
+    private Text healthLabel;
+
     private float maxAcceleration = 2f;
     private float fireSpeed = 5f;
     private float xMin, xMax, offsetSpace = 1f;
     private GameObject playerProjectiles_GO;
     public GameObject projectile_GO;
+
+
 
     public AudioClip fireSound;
 
@@ -24,6 +30,8 @@ public class Player_SC : MonoBehaviour {
         computePlayersMaxPosition();
         generateUiButtons();
         playerProjectiles_GO = GameObject.Find("PlayerProjectiles");
+        healthLabel = GameObject.Find("Life").GetComponent<Text>();
+        healthLabel.text = health.ToString();
     }
 
     // Update is called once per frame
@@ -32,6 +40,7 @@ public class Player_SC : MonoBehaviour {
         playerMovementByDefault(1f);
         controllUiButtons();
         fireController();
+        updateHealthLabel();
     }
 
     private void computePlayersMaxPosition() {
@@ -61,7 +70,7 @@ public class Player_SC : MonoBehaviour {
     private void changePlayerPosition(Vector3 vector3, float speed) {
         transform.position += vector3 * speed * Time.deltaTime;
         float newX = Mathf.Clamp(transform.position.x, xMin, xMax);
-        transform.position = new Vector3(newX,transform.position.y, transform.position.z);
+        transform.position = new Vector3(newX, transform.position.y, transform.position.z);
     }
 
     private void playerMovementByDefault(float levelRunningSpeed) {
@@ -150,14 +159,27 @@ public class Player_SC : MonoBehaviour {
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.transform.tag.Equals("FreeEnemy")) {
+        Debug.Log("Collider detected");
+        Missle_SC missle = collider.gameObject.GetComponent<Missle_SC>();
+        if (missle) {
+            health -= missle.getDamage();
             Destroy(collider.gameObject);
-        } else {
-            Debug.Log("PLAYER - Collider detected");
+            if (health <= 0) {
+                Debug.Log("Player dead!");
+                Destroy(gameObject);
+                //gameManagerScript.loadLevel("WinScene");
+            }
         }
+
+
+
+
     }
 
 
+    private void updateHealthLabel() {
+        healthLabel.text = health.ToString();
+    }
 
 
 }
