@@ -19,4 +19,8 @@ public class GameManager_SC : MonoBehaviour {
         Debug.Log("Current scene=" + currentSceneNo);
         return currentSceneNo;
     }
+
+    void Update() {
+        Debug.Log("GameManager here");
+    }
 }
