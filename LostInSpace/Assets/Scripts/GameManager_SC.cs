@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System;
 
 public class GameManager_SC : MonoBehaviour {
 
-    public void loadLevel(string level) {
-        Debug.Log("Loading level named " + level);
-        SceneManager.LoadScene(level);
-    }
-
-    public void loadLevel(int level) {
-        Debug.Log("Loading level no " + level);
-        SceneManager.LoadScene(level);
+    public void loadLevel(string levelName) {
+        Debug.Log("Loading level named " + levelName);
+        try {
+            SceneManager.LoadScene(levelName);
+        } catch (Exception ex) {
+            Debug.LogError("Scene " + levelName + " cannot be found");
+        }
     }
 
     public int getCurrentLevel() {
@@ -20,7 +20,7 @@ public class GameManager_SC : MonoBehaviour {
         return currentSceneNo;
     }
 
-    void Update() {
-        Debug.Log("GameManager here");
+    void Start() {
+        Debug.Log("GameManager here, level=" + getCurrentLevel());
     }
 }
