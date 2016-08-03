@@ -23,4 +23,12 @@ public class GameManager_SC : MonoBehaviour {
     void Start() {
         Debug.Log("GameManager here, level=" + getCurrentLevel());
     }
+
+    public int getDifficultyIndex() {
+        string entireLevelName = SceneManager.GetActiveScene().name;
+        Debug.Log("Scene name= " + entireLevelName);
+        String[] splitted = entireLevelName.Split('_');
+        Debug.Log("DifficultyIndex=" + splitted[2]);
+        return Convert.ToInt32(splitted[2]);
+    }
 }

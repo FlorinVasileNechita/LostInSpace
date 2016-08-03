@@ -10,12 +10,17 @@ public class Player_SC : MonoBehaviour {
     private Rect rightArrowButtonRect;
     public Texture2D fireButtonTexture;
     private Rect fireButtonRect;
+    public Texture2D startButtonTexture;
+    private Rect startButtonRect;
 
     public int health;
     private Text healthLabel;
 
+    public static int levelTimeDuration = 60;
+
     public AudioClip lowHealth;
     private bool lowHealthIsPlaying = false;
+    private bool levelIsCompleted = false;
 
     private float maxAcceleration = 2f;
     private float fireSpeed = 5f;
@@ -23,18 +28,27 @@ public class Player_SC : MonoBehaviour {
     private GameObject playerProjectiles_GO;
     public GameObject projectile_GO;
 
-
-
     public AudioClip fireSound;
+
+    private GameManager_SC gameManager_SC;
+
+    private float ratioX, ratioY;
 
     // Use this for initialization
     void Start() {
+
+        ratioX = Screen.width / 480f;
+        ratioY = Screen.height / 800f;
+        Debug.Log("ratioX =" + ratioX + "   ratioY=" + ratioY);
         Debug.Log("Player_SC started!");
         computePlayersMaxPosition();
         generateUiButtons();
         playerProjectiles_GO = GameObject.Find("PlayerProjectiles");
         healthLabel = GameObject.Find("Life").GetComponent<Text>();
+        gameManager_SC = GameObject.Find("GameManager_GO").GetComponent<GameManager_SC>();
         healthLabel.text = health.ToString();
+
+        gameManager_SC.getDifficultyIndex();
     }
 
     // Update is called once per frame
@@ -46,6 +60,8 @@ public class Player_SC : MonoBehaviour {
         playerIsDead();
         updateHealthLabel();
         checkLowHealth();
+
+        levelCompeted();
     }
 
     private void computePlayersMaxPosition() {
@@ -102,24 +118,39 @@ public class Player_SC : MonoBehaviour {
     private int[] leftArrowButtonProperties;
     private int[] rightArrowButtonProperties;
     private int[] fireButtonProperties;
+    private int[] startButtonProperties;
 
     private void generateUiButtons() {
-        int distanceBetweenButtons = 30;
+        int distanceBetweenButtons = 40;
+        int scaleDefaultFactor = 90;
 
-        leftArrowButtonProperties = new int[] { 0, Screen.height - leftArrowButtonTexture.height / 2 - distanceBetweenButtons, leftArrowButtonTexture.width, leftArrowButtonTexture.height };
+        //leftArrowButtonProperties = new int[] { 0, Screen.height - 90 / 2 - distanceBetweenButtons, 90, 90 };
+        leftArrowButtonProperties = new int[] { 0, Screen.height - scaleDefaultFactor / 2 - distanceBetweenButtons, Convert.ToInt32(scaleDefaultFactor * ratioX), Convert.ToInt32(scaleDefaultFactor * ratioY) };
         leftArrowButtonRect = new Rect(leftArrowButtonProperties[0], leftArrowButtonProperties[1], leftArrowButtonProperties[2], leftArrowButtonProperties[3]);
 
-        rightArrowButtonProperties = new int[] { leftArrowButtonTexture.width + 2 * distanceBetweenButtons, Screen.height - leftArrowButtonTexture.height / 2 - distanceBetweenButtons, leftArrowButtonTexture.width, leftArrowButtonTexture.height };
+        //rightArrowButtonProperties = new int[] { leftArrowButtonTexture.width + 2 * distanceBetweenButtons, Screen.height - 90 / 2 - distanceBetweenButtons, 90, 90 };
+        rightArrowButtonProperties = new int[] { leftArrowButtonTexture.width + 2 * distanceBetweenButtons, Screen.height - scaleDefaultFactor / 2 - distanceBetweenButtons, Convert.ToInt32(scaleDefaultFactor * ratioX), Convert.ToInt32(scaleDefaultFactor * ratioY) };
         rightArrowButtonRect = new Rect(rightArrowButtonProperties[0], rightArrowButtonProperties[1], rightArrowButtonProperties[2], rightArrowButtonProperties[3]);
 
-        fireButtonProperties = new int[] { Screen.width - fireButtonTexture.width / 2 - distanceBetweenButtons, Screen.height - fireButtonTexture.height / 2 - distanceBetweenButtons, fireButtonTexture.width, fireButtonTexture.height };
+        // fireButtonProperties = new int[] { Screen.width - fireButtonTexture.width / 2 - distanceBetweenButtons, Screen.height - fireButtonTexture.height / 2 - distanceBetweenButtons, fireButtonTexture.width, fireButtonTexture.height };
+        fireButtonProperties = new int[] { Screen.width - scaleDefaultFactor / 2 - distanceBetweenButtons-5, Screen.height - 160 / 2 - distanceBetweenButtons, Convert.ToInt32(scaleDefaultFactor * ratioX), Convert.ToInt32(120 * ratioY) };
         fireButtonRect = new Rect(fireButtonProperties[0], fireButtonProperties[1], fireButtonProperties[2], fireButtonProperties[3]);
+
+        // startButtonProperties = new int[] { Screen.width - startButtonTexture.width / 2 - distanceBetweenButtons, Screen.height / 2 , startButtonTexture.width, startButtonTexture.height };
+        startButtonProperties = new int[] { (rightArrowButtonProperties[0] + fireButtonProperties[0]) / 2, Screen.height - scaleDefaultFactor / 2 - distanceBetweenButtons-20, Convert.ToInt32(scaleDefaultFactor * ratioX), Convert.ToInt32(120 * ratioY) };
+        startButtonRect = new Rect(startButtonProperties[0], startButtonProperties[1], startButtonProperties[2], startButtonProperties[3]);
+
+
     }
 
     void OnGUI() {
         GUI.Button(leftArrowButtonRect, leftArrowButtonTexture);
         GUI.Button(rightArrowButtonRect, rightArrowButtonTexture);
         GUI.Button(fireButtonRect, fireButtonTexture);
+
+        if (levelIsCompleted) {
+            GUI.Button(startButtonRect, startButtonTexture);
+        }
     }
 
     void controllUiButtons() {
@@ -136,10 +167,20 @@ public class Player_SC : MonoBehaviour {
                     }
                 }
             }
+
             // FIRE ZONE
             if (verifyTouchedButton(touch, fireButtonProperties)) {
                 if (touch.phase == TouchPhase.Began) {
                     fire();
+                }
+            }
+            // START BUTTON ZONE
+            if (levelCompeted()) {
+                if (verifyTouchedButton(touch, startButtonProperties)) {
+                    if (touch.phase == TouchPhase.Began) {
+                        Debug.Log("START button PRESSED");
+                        gameManager_SC.loadLevel("04_WinScene");
+                    }
                 }
             }
         }
@@ -151,14 +192,10 @@ public class Player_SC : MonoBehaviour {
         int yStartPosition = buttonProperties[1];
         int yEndPosition = buttonProperties[1] + buttonProperties[3];
 
-        Debug.Log("Touch[" + currentTouch.position.x + "," + currentTouch.position.y + "]");
-        Debug.Log("X=[" + xStartPosition + "," + xEndPosition + "]");
-        Debug.Log("Y=[" + yStartPosition + "," + yEndPosition + "]");
+        Debug.Log("Touch[" + currentTouch.position.x + "," + currentTouch.position.y + "]" + "   " + "X=[" + xStartPosition + "," + xEndPosition + "]   " + "Y=[" + yStartPosition + "," + yEndPosition + "]");
 
         if (currentTouch.position.x >= buttonProperties[0] && currentTouch.position.x <= buttonProperties[0] + buttonProperties[2]) {
-            //if (currentTouch.position.y >= buttonProperties[1] && currentTouch.position.y <= buttonProperties[1] + buttonProperties[3]) {
             return true;
-            //}
         }
         return false;
     }
@@ -170,22 +207,28 @@ public class Player_SC : MonoBehaviour {
             health -= missle.getDamage();
             Destroy(collider.gameObject);
         }
-
-
-
-
     }
 
     private void playerIsDead() {
         if (health <= 0) {
             Debug.Log("Player dead!");
             Destroy(gameObject);
-            //gameManagerScript.loadLevel("WinScene");
+            gameManager_SC.loadLevel("05_LoseScene");
         }
     }
 
     private void updateHealthLabel() {
+        if (health < 0) {
+            health = 0;
+        }
         healthLabel.text = health.ToString();
+        if (health <= 40) {
+            healthLabel.color = Color.red;
+        } else {
+            if (health > 40) {
+                healthLabel.color = Color.green;
+            }
+        }
     }
 
     public void addHealth(int value) {
@@ -203,6 +246,15 @@ public class Player_SC : MonoBehaviour {
                 lowHealthIsPlaying = false;
             }
         }
+    }
+
+    private Boolean levelCompeted() {
+        //Debug.Log("Time since level is loaded = " + Time.timeSinceLevelLoad);
+        if (Time.timeSinceLevelLoad >= levelTimeDuration) {
+            levelIsCompleted = true;
+            return true;
+        }
+        return false;
     }
 
 

@@ -12,7 +12,6 @@ public class EnemyBehaviour_SC : MonoBehaviour {
 
     private float health = 100f;
 
-
     // Use this for initialization
     void Start() {
         scoreController = GameObject.Find("Score").GetComponent<ScoreController_SC>();
@@ -38,13 +37,13 @@ public class EnemyBehaviour_SC : MonoBehaviour {
             Debug.Log("Enemie hit by PLAYER");
             AudioSource.PlayClipAtPoint(deathSound, transform.position);
             Destroy(gameObject);
-            playerScript.addHealth(-getRandomValues(10,30));
+            playerScript.addHealth(-getRandomValue(10,30));
             //TODO add health - for the player
         } else {
             //hitted by players projectile
             Debug.Log("Enemie hit by PLAYER projectile");
             AudioSource.PlayClipAtPoint(hitSound, transform.position);
-            int value = getRandomValues(10, 30);
+            int value = getRandomValue(10, 30);
             health -= value;
             if (health <= 0f) {
                 AudioSource.PlayClipAtPoint(deathSound, transform.position);
@@ -55,7 +54,7 @@ public class EnemyBehaviour_SC : MonoBehaviour {
         }
     }
 
-    private int getRandomValues(int low, int hight) {
+    private int getRandomValue(int low, int hight) {
         System.Random random = new System.Random();
         return random.Next(low, hight);
     }
