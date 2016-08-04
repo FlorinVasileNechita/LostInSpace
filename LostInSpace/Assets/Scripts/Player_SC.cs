@@ -54,7 +54,8 @@ public class Player_SC : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         playerMovementController(KeyCode.F15);
-        playerMovementByDefault(1f);
+        //playerMovementByDefault(1f);
+        playerMovementByDefault2(1.5f);
         controllUiButtons();
         fireController();
         playerIsDead();
@@ -93,9 +94,13 @@ public class Player_SC : MonoBehaviour {
         float newX = Mathf.Clamp(transform.position.x, xMin, xMax);
         transform.position = new Vector3(newX, transform.position.y, transform.position.z);
     }
-
+    /*
     private void playerMovementByDefault(float levelRunningSpeed) {
         changePlayerPosition(Vector3.up, levelRunningSpeed);
+    }*/
+
+    private void playerMovementByDefault2(float levelRunningSpeed) {
+        changePlayerPosition(new Vector3(0,levelRunningSpeed, 0), levelRunningSpeed);
     }
 
     private void fireController() {
