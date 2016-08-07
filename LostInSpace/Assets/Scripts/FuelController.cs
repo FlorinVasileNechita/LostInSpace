@@ -4,7 +4,6 @@ using System.Collections;
 using System;
 
 public class FuelController : MonoBehaviour {
-    private int fuelLevel = 0;
     private Player_SC player_SC;
     private int levelTimeDuration;
 

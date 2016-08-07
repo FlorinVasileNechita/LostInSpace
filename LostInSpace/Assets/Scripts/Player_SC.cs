@@ -83,9 +83,13 @@ public class Player_SC : MonoBehaviour {
             changePlayerPosition(Vector3.right, maxAcceleration);
         }
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) {
-            changePlayerPosition(Vector3.up, maxAcceleration);
+            //changePlayerPosition(Vector3.up, maxAcceleration);
         } else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) {
             // changePlayerPosition(Vector3.down, speed);
+        }
+
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) {
+            liftOffButtonPressed();
         }
     }
 
@@ -94,10 +98,6 @@ public class Player_SC : MonoBehaviour {
         float newX = Mathf.Clamp(transform.position.x, xMin, xMax);
         transform.position = new Vector3(newX, transform.position.y, transform.position.z);
     }
-    /*
-    private void playerMovementByDefault(float levelRunningSpeed) {
-        changePlayerPosition(Vector3.up, levelRunningSpeed);
-    }*/
 
     private void playerMovementByDefault2(float levelRunningSpeed) {
         changePlayerPosition(new Vector3(0,levelRunningSpeed, 0), levelRunningSpeed);
@@ -116,7 +116,6 @@ public class Player_SC : MonoBehaviour {
         GameObject fire = Instantiate(projectile_GO, new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity) as GameObject;
         fire.transform.parent = playerProjectiles_GO.transform;
         fire.GetComponent<Rigidbody2D>().velocity = new Vector2(0, fireSpeed);
-        // add audio
         AudioSource.PlayClipAtPoint(fireSound, transform.position);
     }
 
@@ -183,12 +182,16 @@ public class Player_SC : MonoBehaviour {
             if (levelCompeted()) {
                 if (verifyTouchedButton(touch, startButtonProperties)) {
                     if (touch.phase == TouchPhase.Began) {
-                        Debug.Log("START button PRESSED");
-                        gameManager_SC.loadLevel("04_WinScene");
+                        Debug.Log("LIFT OFF button PRESSED");
+                        liftOffButtonPressed();
                     }
                 }
             }
         }
+    }
+
+    private void liftOffButtonPressed() {
+        gameManager_SC.loadLevel("04_WinScene");
     }
 
     private bool verifyTouchedButton(Touch currentTouch, int[] buttonProperties) {

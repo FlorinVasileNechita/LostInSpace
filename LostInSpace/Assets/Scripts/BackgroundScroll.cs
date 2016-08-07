@@ -4,7 +4,7 @@ using System.Collections;
 
 public class BackgroundScroll : MonoBehaviour {
 
-    public float scrollSpeed = 0.5f;
+    public float scrollSpeed;
 
 	// Use this for initialization
 	void Start () {
