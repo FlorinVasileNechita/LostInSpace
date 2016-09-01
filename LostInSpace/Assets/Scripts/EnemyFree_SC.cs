@@ -24,11 +24,6 @@ public class EnemyFree_SC : MonoBehaviour {
     }
 
     private void spawnEnemies() {
-        /* float probability = 0.05f * Time.deltaTime;
-         if (Random.value < probability) {
-             GameObject enemie = Instantiate(freeEnemies[Random.Range(0, freeEnemies.GetLength(0))], new Vector3(transform.position.x, transform.position.y, 0), Quaternion.identity) as GameObject;
-             enemie.transform.parent = enemiesGroup.transform;
-         }*/
         int timeSinceLevelLoadedAsInt = Convert.ToInt32(Time.timeSinceLevelLoad);
         if (timeSinceLevelLoadedAsInt > waitTime) {
             if (timeSinceLevelLoadedAsInt % spawnSeconds == 0 && !enemyDeployed) {

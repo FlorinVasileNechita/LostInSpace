@@ -16,7 +16,7 @@ public class Player_SC : MonoBehaviour {
     public int health;
     private Text healthLabel;
 
-    public static int levelTimeDuration = 60;
+    public static int levelTimeDuration = 180;
 
     public AudioClip lowHealth;
     private bool lowHealthIsPlaying = false;
@@ -54,14 +54,12 @@ public class Player_SC : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         playerMovementController(KeyCode.F15);
-        //playerMovementByDefault(1f);
         playerMovementByDefault2(1.5f);
         controllUiButtons();
         fireController();
         playerIsDead();
         updateHealthLabel();
         checkLowHealth();
-
         levelCompeted();
     }
 
@@ -81,11 +79,6 @@ public class Player_SC : MonoBehaviour {
             changePlayerPosition(Vector3.left, maxAcceleration);
         } else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) || keyCode == KeyCode.D) {
             changePlayerPosition(Vector3.right, maxAcceleration);
-        }
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)) {
-            //changePlayerPosition(Vector3.up, maxAcceleration);
-        } else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) {
-            // changePlayerPosition(Vector3.down, speed);
         }
 
         if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) {
@@ -159,7 +152,6 @@ public class Player_SC : MonoBehaviour {
 
     void controllUiButtons() {
         foreach (Touch touch in Input.touches) {
-            // if (leftRectButton.Contains(touch.position)) {
             if ((touch.phase == TouchPhase.Began) || (touch.phase == TouchPhase.Stationary)) {
                 if (verifyTouchedButton(touch, leftArrowButtonProperties)) {
                     Debug.Log("LEFT ARROW PRESSED");
@@ -257,7 +249,6 @@ public class Player_SC : MonoBehaviour {
     }
 
     private Boolean levelCompeted() {
-        //Debug.Log("Time since level is loaded = " + Time.timeSinceLevelLoad);
         if (Time.timeSinceLevelLoad >= levelTimeDuration) {
             levelIsCompleted = true;
             return true;
